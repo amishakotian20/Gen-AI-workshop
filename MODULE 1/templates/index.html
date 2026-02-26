@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>POLYGLOT.AI — Explain Anything, Any Style</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IM+Fell+English:ital@0;1&family=Pirata+One&family=Rye&family=Share+Tech+Mono&family=Fredoka+One&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #060608;
+      --surface: #0d0d10;
+      --border: #1a1a1f;
+      --text: #e8e0d5;
+      --muted: #444;
+      --mode-color: #c9a84c;
+      --mode-accent: #f0d080;
+      --mode-bg: #1a1208;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(180deg, #0c0c10 0%, transparent 100%);
+    }
+    .logo {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 26px;
+      letter-spacing: 5px;
+      background: linear-gradient(135deg, var(--mode-color), var(--mode-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: all 0.5s ease;
+    }
+    .tagline {
+      margin-left: auto;
+      font-size: 10px;
+      color: #333;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* ─── MAIN ─── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+
+    /* ─── LABEL ─── */
+    .label {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: #555;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    /* ─── API KEY ─── */
+    .api-section { margin-bottom: 32px; }
+    .input-wrap { position: relative; }
+    .api-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 48px 12px 16px;
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+      letter-spacing: 1px;
+      transition: border-color 0.3s;
+    }
+    .api-input:focus { outline: none; border-color: var(--mode-color); }
+    .toggle-key {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: #444; cursor: pointer; font-size: 16px;
+      transition: color 0.2s;
+    }
+    .toggle-key:hover { color: var(--mode-accent); }
+
+    /* ─── MODE GRID ─── */
+    .mode-section { margin-bottom: 32px; }
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+    @media(max-width: 600px) {
+      .mode-grid { grid-template-columns: repeat(3, 1fr); }
+      header { padding: 16px 20px; }
+      .tagline { display: none; }
+    }
+    .mode-card {
+      cursor: pointer;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 8px;
+      text-align: center;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+    .mode-card:hover { transform: scale(1.04); }
+    .mode-card.active {
+      transform: scale(1.06);
+      box-shadow: 0 0 20px color-mix(in srgb, var(--mode-color) 30%, transparent);
+    }
+    .mode-emoji { font-size: 26px; margin-bottom: 6px; }
+    .mode-name {
+      font-size: 12px;
+      color: #666;
+      letter-spacing: 1px;
+    }
+    .mode-card.active .mode-name { color: var(--mode-accent); }
+
+    /* ─── TOPIC ─── */
+    .topic-section { margin-bottom: 24px; }
+    .topic-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: 15px;
+      resize: none;
+      transition: border-color 0.3s, font-family 0.5s;
+      line-height: 1.6;
+    }
+    .topic-input:focus { outline: none; border-color: var(--mode-color); }
+    .quick-topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .pill {
+      background: transparent;
+      border: 1px solid #1e1e1e;
+      border-radius: 20px;
+      padding: 4px 14px;
+      color: #555;
+      font-size: 11px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .pill:hover {
+      border-color: var(--mode-color);
+      color: var(--mode-accent);
+    }
+
+    /* ─── ERROR ─── */
+    .error-box {
+      background: #1a0808;
+      border: 1px solid #5a1a1a;
+      border-radius: 6px;
+      padding: 12px 16px;
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .error-box.show { display: block; }
+
+    /* ─── BUTTON ─── */
+    .explain-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg,
+        color-mix(in srgb, var(--mode-color) 15%, transparent),
+        color-mix(in srgb, var(--mode-color) 30%, transparent));
+      border: 1px solid var(--mode-color);
+      border-radius: 8px;
+      color: var(--mode-accent);
+      font-family: 'Bebas Neue', cursive;
+      font-size: 18px;
+      letter-spacing: 4px;
+      cursor: pointer;
+      margin-bottom: 40px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .explain-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px color-mix(in srgb, var(--mode-color) 40%, transparent);
+    }
+    .explain-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* ─── OUTPUT ─── */
+    #output { display: none; }
+    #output.show { display: block; }
+    .output-card {
+      border-radius: 12px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      background: var(--mode-bg);
+      border: 2px solid var(--mode-color);
+      box-shadow: 0 0 40px color-mix(in srgb, var(--mode-color) 15%, transparent);
+      transition: all 0.5s ease;
+    }
+    .output-badge {
+      position: absolute; top: 16px; right: 16px;
+      background: color-mix(in srgb, var(--mode-color) 20%, transparent);
+      border: 1px solid color-mix(in srgb, var(--mode-color) 40%, transparent);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 11px;
+      color: var(--mode-color);
+      letter-spacing: 2px;
+    }
+    .output-topic-label {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: color-mix(in srgb, var(--mode-color) 60%, transparent);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .output-divider {
+      height: 1px;
+      background: linear-gradient(90deg, var(--mode-color), transparent);
+      margin-bottom: 24px;
+    }
+    .output-text {
+      color: var(--mode-accent);
+      font-size: 17px;
+      line-height: 1.9;
+      white-space: pre-wrap;
+      transition: font-family 0.5s ease;
+    }
+
+    /* ─── LOADING SPINNER ─── */
+    .loading-text {
+      color: color-mix(in srgb, var(--mode-accent) 50%, transparent);
+      font-style: italic;
+      font-size: 16px;
+    }
+    .loading-text::after {
+      content: '';
+      animation: dots 1.5s infinite;
+    }
+    @keyframes dots {
+      0%   { content: ''; }
+      25%  { content: '.'; }
+      50%  { content: '..'; }
+      75%  { content: '...'; }
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .how-section {
+      margin-top: 60px;
+      border-top: 1px solid #111;
+      padding-top: 40px;
+    }
+    .how-title {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: #333;
+      text-align: center;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media(max-width: 500px) {
+      .how-grid { grid-template-columns: 1fr; }
+      .mode-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .how-card {
+      background: #0a0a0c;
+      border: 1px solid #111;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .how-step {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 28px;
+      color: #222;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .how-card-title {
+      font-size: 11px;
+      color: #aaa;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+    .how-card-desc {
+      font-size: 11px;
+      color: #444;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo" id="logo">POLYGLOT.AI</div>
+    <div class="tagline">Explain Anything · Any Style</div>
+  </header>
+
+  <main>
+
+    <!-- API KEY -->
+    <section class="api-section">
+      <span class="label">Groq API Key</span>
+      <div class="input-wrap">
+        <input type="password" id="apiKey" class="api-input" placeholder="gsk_..." autocomplete="off"/>
+        <button class="toggle-key" onclick="toggleKey()" id="toggleBtn">👁</button>
+      </div>
+    </section>
+
+    <!-- MODES -->
+    <section class="mode-section">
+      <span class="label">Select Explanation Style</span>
+      <div class="mode-grid" id="modeGrid">
+        {% for id, mode in modes.items() %}
+        <div class="mode-card {% if loop.first %}active{% endif %}"
+             data-mode="{{ id }}"
+             data-color="{{ ['#c9a84c','#e07b39','#8fbc5a','#5ab8f0','#f07ab8'][loop.index0] }}"
+             data-accent="{{ ['#f0d080','#ff9f5a','#b8f07a','#7ad4ff','#ffaadd'][loop.index0] }}"
+             data-bg="{{ ['#1a1208','#110a05','#080f04','#040d14','#140810'][loop.index0] }}"
+             data-font="{{ ['IM Fell English, serif','Pirata One, cursive','Rye, cursive','Share Tech Mono, monospace','Fredoka One, cursive'][loop.index0] }}"
+             onclick="selectMode(this)">
+          <div class="mode-emoji">{{ mode.emoji }}</div>
+          <div class="mode-name">{{ mode.label }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- TOPIC -->
+    <section class="topic-section">
+      <span class="label">Topic to Explain</span>
+      <textarea id="topic" class="topic-input" rows="3"
+        placeholder="What shall be explained?"></textarea>
+      <div class="quick-topics">
+        {% for t in ['Black holes','Photosynthesis','The internet','Quantum computing','Climate change','Evolution','Democracy','Cryptocurrency','DNA','Gravity'] %}
+        <button class="pill" onclick="setTopic('{{ t }}')">{{ t }}</button>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ERROR -->
+    <div class="error-box" id="errorBox"></div>
+
+    <!-- BUTTON -->
+    <button class="explain-btn" id="explainBtn" onclick="explain()">
+      ⚡ Explain as <span id="btnLabel">Shakespeare</span>
+    </button>
+
+    <!-- OUTPUT -->
+    <div id="output">
+      <div class="output-card" id="outputCard">
+        <div class="output-badge" id="outputBadge">🎭 SHAKESPEARE</div>
+        <div class="output-topic-label" id="outputTopic">TOPIC: —</div>
+        <div class="output-divider"></div>
+        <div class="output-text" id="outputText"></div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="how-section" id="howSection">
+      <div class="how-title">How It Works</div>
+      <div class="how-grid">
+        <div class="how-card">
+          <div class="how-step">01</div>
+          <div class="how-card-title">System Prompt</div>
+          <div class="how-card-desc">Each mode injects a unique persona via the system prompt — defining voice, vocabulary & style.</div>
+        </div>
+        <div class="how-card">
+          <div class="how-step">02</div>
+          <div class="how-card-title">User Prompt</div>
+          <div class="how-card-desc">Your topic becomes the user message: "Explain [topic] in your unique style."</div>
+        </div>
+        <div class="how-card">
+          <div class="how-step">03</div>
+          <div class="how-card-title">Style Adaptation</div>
+          <div class="how-card-desc">Claude adapts tone, vocabulary & structure to fully embody the chosen character persona.</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // ─── STATE ───
+    let currentMode = {
+      id: 'shakespeare',
+      color: '#c9a84c',
+      accent: '#f0d080',
+      bg: '#1a1208',
+      font: 'IM Fell English, serif',
+      label: 'Shakespeare',
+      emoji: '🎭'
+    };
+
+    // ─── MODE SELECTION ───
+    function selectMode(card) {
+      document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+
+      currentMode = {
+        id: card.dataset.mode,
+        color: card.dataset.color,
+        accent: card.dataset.accent,
+        bg: card.dataset.bg,
+        font: card.dataset.font,
+        label: card.querySelector('.mode-name').textContent,
+        emoji: card.querySelector('.mode-emoji').textContent
+      };
+
+      applyModeStyles();
+    }
+
+    function applyModeStyles() {
+      const r = document.documentElement;
+      r.style.setProperty('--mode-color', currentMode.color);
+      r.style.setProperty('--mode-accent', currentMode.accent);
+      r.style.setProperty('--mode-bg', currentMode.bg);
+
+      document.getElementById('btnLabel').textContent = currentMode.label;
+      document.getElementById('topic').style.fontFamily = currentMode.font;
+      document.getElementById('outputText').style.fontFamily = currentMode.font;
+      clearOutput();
+    }
+
+    // ─── TOPIC PILLS ───
+    function setTopic(t) { document.getElementById('topic').value = t; }
+
+    // ─── TOGGLE KEY ───
+    function toggleKey() {
+      const input = document.getElementById('apiKey');
+      const btn = document.getElementById('toggleBtn');
+      if (input.type === 'password') {
+        input.type = 'text'; btn.textContent = '🙈';
+      } else {
+        input.type = 'password'; btn.textContent = '👁';
+      }
+    }
+
+    // ─── EXPLAIN ───
+    async function explain() {
+      const apiKey = document.getElementById('apiKey').value.trim();
+      const topic  = document.getElementById('topic').value.trim();
+
+      hideError();
+      if (!apiKey) { showError('Please enter your Anthropic API key.'); return; }
+      if (!topic)  { showError('Please enter a topic to explain.'); return; }
+
+      setLoading(true);
+      showOutput(topic);
+
+      try {
+        const res = await fetch('/explain', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ api_key: apiKey, topic, mode: currentMode.id })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          showError(data.error || 'Something went wrong.');
+          clearOutput();
+          return;
+        }
+
+        document.getElementById('outputText').textContent = data.explanation;
+        document.getElementById('howSection').style.display = 'none';
+
+      } catch (e) {
+        showError('Network error. Is the Flask server running?');
+        clearOutput();
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // ─── HELPERS ───
+    function showOutput(topic) {
+      const out = document.getElementById('output');
+      out.classList.add('show');
+      document.getElementById('outputBadge').textContent = `${currentMode.emoji} ${currentMode.label.toUpperCase()}`;
+      document.getElementById('outputTopic').textContent = `TOPIC: ${topic.toUpperCase()}`;
+      document.getElementById('outputText').innerHTML = '<span class="loading-text">Summoning the voice</span>';
+      out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function clearOutput() {
+      document.getElementById('output').classList.remove('show');
+    }
+
+    function setLoading(on) {
+      const btn = document.getElementById('explainBtn');
+      btn.disabled = on;
+      btn.textContent = on
+        ? `Channeling ${currentMode.label}…`
+        : `⚡ Explain as ${currentMode.label}`;
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('errorBox');
+      box.textContent = '⚠ ' + msg;
+      box.classList.add('show');
+    }
+
+    function hideError() {
+      document.getElementById('errorBox').classList.remove('show');
+    }
+
+    // Enter to submit
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('topic').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); explain(); }
+      });
+    });
+  </script>
+
+</body>
+</html>
