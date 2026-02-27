@@ -1,0 +1,1 @@
+ Artificial Intelligence (AI) enables machines to mimic human intelligence, including learning, reasoning, and problem-solving. It powers applications from natural language processing to computer vision and predictive analytics

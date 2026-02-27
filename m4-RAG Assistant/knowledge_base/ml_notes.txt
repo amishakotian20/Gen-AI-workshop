@@ -1,0 +1,1 @@
+Machine Learning (ML) is a subset of AI that allows systems to learn from data and improve performance without explicit programming. It’s widely used in prediction, classification, and pattern recognition tasks.

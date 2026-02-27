@@ -1,0 +1,15 @@
+Artificial Intelligence (AI) is the branch of computer science that focuses on creating systems capable of performing tasks that normally require human intelligence. These tasks include learning, reasoning, problem-solving, perception, and language understanding.
+
+Types of AI:
+1. Narrow AI – Designed for specific tasks (e.g., chatbots, recommendation systems).
+2. General AI – Capable of performing any intellectual task like a human.
+3. Super AI – Hypothetical AI that surpasses human intelligence.
+
+Key Applications of AI:
+- Healthcare (disease prediction, medical imaging)
+- Finance (fraud detection)
+- Autonomous vehicles
+- Natural Language Processing
+- Robotics
+
+AI techniques include Machine Learning, Deep Learning, Expert Systems, and Computer Vision.
